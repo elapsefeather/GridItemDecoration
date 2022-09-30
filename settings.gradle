@@ -14,3 +14,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "GridItemDecoration"
 include ':app'
+include ':GridItemDecoration'
