@@ -1,13 +1,8 @@
 package com.elapsefeather.griditemdecoration;
 
-import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
+import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -18,83 +13,88 @@ import androidx.recyclerview.widget.RecyclerView;
 public class GridItemDecoration extends RecyclerView.ItemDecoration {
     private static final String TAG = GridItemDecoration.class.getSimpleName();
 
-    public static final int HORIZONTAL = LinearLayout.HORIZONTAL;
-    public static final int VERTICAL = LinearLayout.VERTICAL;
-    public static final int INSIDEALL = 2;
-    public static final int ROUNDALL = 3;
+    public interface DecorationStyle {
+        int HORIZONTAL = LinearLayout.HORIZONTAL;
+        int VERTICAL = LinearLayout.VERTICAL;
+        int INSIDEALL = 2;
+        int ROUNDALL = 3;
+    }
 
-    private Drawable mDivider;
-    private int mOrientation;
-    private Rect mBounds;
+    //    private mDivider;
+    private int mOrientation = LinearLayout.VERTICAL;
+    private Rect mBounds = new Rect();
+    private int dividerColor;
+    private int dividerSize;
+    private Paint mPaint;
+    private Builder mBuilder;
 
     /**
      * Creates a divider [RecyclerView.ItemDecoration] that can be used with a
      * [LinearLayoutManager].
      *
-     * @param context     Current context, it will be used to access resources.
-     * @param orientation Divider orientation. Should be [.HORIZONTAL] or [.VERTICAL].
+     * @param orientation Divider orientation. Should be [.HORIZONTAL] or [.VERTICAL] or [.INSIDEALL] or [.ROUNDALL]
      */
-    public GridItemDecoration(Context context, int orientation) {
-        mDivider = null;
-        /**
-         * Current orientation. Either [.HORIZONTAL] or [.VERTICAL].
-         */
-        mOrientation = 0;
-        mBounds = new Rect();
-
-        TypedArray a = context.obtainStyledAttributes(new int[]{android.R.attr.listDivider});
-        mDivider = context.getDrawable(R.drawable.divider);
-        if (mDivider == null) {
-            Log.w(TAG, "@android:attr/listDivider was not set in the theme used for this " + "DividerItemDecoration. Please set that attribute all call setDrawable()");
-        }
-        a.recycle();
+    public GridItemDecoration(int orientation) {
         setOrientation(orientation);
+        initPaint();
+    }
 
+    public GridItemDecoration(int orientation, int color) {
+        this.dividerColor = color;
+        setOrientation(orientation);
+        initPaint();
+    }
+
+    public GridItemDecoration(Builder builder) {
+        if (builder != null) {
+            this.mBuilder = builder;
+
+            if (builder.orientation != null) setOrientation(builder.orientation);
+            if (builder.color != null) dividerColor = builder.color;
+            if (builder.size != null) dividerSize = builder.size;
+        }
+        initPaint();
     }
 
     public void setDividerColor(int color) {
-        if (mDivider != null)
-            mDivider.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP));
+        this.dividerColor = color;
+        initPaint();
     }
 
     /**
      * Sets the orientation for this divider. This should be called if
      * [RecyclerView.LayoutManager] changes orientation.
      *
-     * @param orientation [.HORIZONTAL] or [.VERTICAL]
+     * @param orientation [.HORIZONTAL] or [.VERTICAL] or [.INSIDEALL] or [.ROUNDALL]
      */
     public void setOrientation(int orientation) {
-        if (orientation != HORIZONTAL && orientation != VERTICAL && orientation != INSIDEALL && orientation != ROUNDALL) {
+        if (orientation != DecorationStyle.HORIZONTAL && orientation != DecorationStyle.VERTICAL
+                && orientation != DecorationStyle.INSIDEALL && orientation != DecorationStyle.ROUNDALL) {
             throw new IllegalArgumentException("Invalid orientation. It should be either HORIZONTAL or VERTICAL");
         }
         mOrientation = orientation;
     }
 
-    /**
-     * Sets the [Drawable] for this divider.
-     *
-     * @param drawable Drawable that should be used as a divider.
-     */
-    public void setDrawable(Drawable drawable) {
-        if (drawable == null) {
-            throw new IllegalArgumentException("Drawable cannot be null.");
-        }
-        mDivider = drawable;
+    private void initPaint() {
+        mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPaint.setStyle(Paint.Style.FILL);
+        mPaint.setColor(dividerColor);
     }
 
     @Override
     public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-        if (parent.getLayoutManager() == null || mDivider == null) return;
+        if (parent.getLayoutManager() == null) return;
 
         switch (mOrientation) {
-            case ROUNDALL:
-            case INSIDEALL:
+            case DecorationStyle.ROUNDALL:
+            case DecorationStyle.INSIDEALL:
                 drawVertical(c, parent);
                 drawHorizontal(c, parent);
                 break;
-            case VERTICAL:
+            case DecorationStyle.VERTICAL:
                 drawVertical(c, parent);
                 break;
+            case DecorationStyle.HORIZONTAL:
             default:
                 drawHorizontal(c, parent);
                 break;
@@ -104,40 +104,10 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
     private void drawVertical(Canvas canvas, RecyclerView parent) {
         canvas.save();
 
-        int left;
-        int right;
-
-        if (parent.getClipToPadding()) {
-            left = parent.getPaddingLeft();
-            right = parent.getWidth() - parent.getPaddingRight();
-            canvas.clipRect(left, parent.getPaddingTop(), right, parent.getHeight() - parent.getPaddingBottom());
-        } else {
-            left = 0;
-            right = parent.getWidth();
-        }
-
         int childCount = parent.getChildCount();
-
+        int spanCount = -1;
         if (parent.getLayoutManager() instanceof GridLayoutManager) {
-            int leftItems = childCount % ((GridLayoutManager) parent.getLayoutManager()).getSpanCount();
-            if (leftItems == 0) {
-                leftItems = ((GridLayoutManager) parent.getLayoutManager()).getSpanCount();
-            }
-            childCount -= leftItems;
-        }
-
-        if (mOrientation == ROUNDALL) {
-            //最上面那條
-            View child = parent.getChildAt(0);
-            if (child == null) return;
-
-            parent.getDecoratedBoundsWithMargins(child, mBounds);
-            int bottom = mDivider.getIntrinsicHeight();
-            int top = 0;
-            mDivider.setBounds(left, top, right, bottom);
-            mDivider.draw(canvas);
-        } else {
-            childCount -= 1;
+            spanCount = ((GridLayoutManager) parent.getLayoutManager()).getSpanCount();
         }
 
         for (int i = 0; i <= childCount; i++) {
@@ -145,10 +115,22 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
             if (child == null) return;
 
             parent.getDecoratedBoundsWithMargins(child, mBounds);
-            int bottom = mBounds.bottom + Math.round(child.getTranslationY());
-            int top = bottom - mDivider.getIntrinsicHeight();
-            mDivider.setBounds(left, top, right, bottom);
-            mDivider.draw(canvas);
+            int left = mBounds.left;
+            int right = mBounds.right;
+
+//                最上面那條
+            if (mOrientation == DecorationStyle.ROUNDALL && spanCount != -1 && i < childCount - childCount % spanCount) {
+                int bottom = dividerSize;
+                int top = 0;
+                canvas.drawRect(left, top, right, bottom, mPaint);
+            }
+//            最下面的，除非是 ROUNDALL 不然不畫
+            if (mOrientation == DecorationStyle.ROUNDALL ||
+                    (mOrientation != DecorationStyle.ROUNDALL && spanCount != -1 && i < childCount - childCount % spanCount)) {
+                int bottom = mBounds.bottom + Math.round(child.getTranslationY());
+                int top = bottom - dividerSize;
+                canvas.drawRect(left, top, right, bottom, mPaint);
+            }
         }
 
         canvas.restore();
@@ -157,45 +139,32 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
     private void drawHorizontal(Canvas canvas, RecyclerView parent) {
         canvas.save();
 
-        int top;
-        int bottom;
-
-        if (parent.getClipToPadding()) {
-            top = parent.getPaddingTop();
-            bottom = parent.getHeight() - parent.getPaddingBottom();
-            canvas.clipRect(parent.getPaddingLeft(), top, parent.getWidth() - parent.getPaddingRight(), bottom);
-        } else {
-            top = 0;
-            bottom = parent.getHeight();
-        }
-
         int childCount = parent.getChildCount();
+        int spanCount = -1;
         if (parent.getLayoutManager() instanceof GridLayoutManager) {
-            childCount = ((GridLayoutManager) parent.getLayoutManager()).getSpanCount();
-        }
-
-        if (mOrientation == ROUNDALL) {
-            //最左邊那條
-            View child = parent.getChildAt(0);
-            if (child == null) return;
-
-            parent.getLayoutManager().getDecoratedBoundsWithMargins(child, mBounds);
-            int right = mDivider.getIntrinsicWidth();
-            int left = 0;
-            mDivider.setBounds(left, top, right, bottom);
-            mDivider.draw(canvas);
-        } else {
-            childCount -= 1;
+            spanCount = ((GridLayoutManager) parent.getLayoutManager()).getSpanCount();
         }
 
         for (int i = 0; i <= childCount - 1; i++) {
             View child = parent.getChildAt(i);
             if (child == null) return;
             parent.getLayoutManager().getDecoratedBoundsWithMargins(child, mBounds);
-            int right = mBounds.right + Math.round(child.getTranslationX());
-            int left = right - mDivider.getIntrinsicWidth();
-            mDivider.setBounds(left, top, right, bottom);
-            mDivider.draw(canvas);
+            int top = mBounds.top;
+            int bottom = mBounds.bottom;
+
+//                最左邊那條
+            if (mOrientation == DecorationStyle.ROUNDALL && spanCount != -1 && i % spanCount == 0) {
+                int right = dividerSize;
+                int left = 0;
+                canvas.drawRect(left, top, right, bottom, mPaint);
+            }
+//            最右邊的，除非是 ROUNDALL 不然不畫
+            if (mOrientation == DecorationStyle.ROUNDALL ||
+                    (mOrientation != DecorationStyle.ROUNDALL && spanCount != -1 && i % spanCount != 2)) {
+                int right = mBounds.right + Math.round(child.getTranslationX());
+                int left = right - dividerSize;
+                canvas.drawRect(left, top, right, bottom, mPaint);
+            }
         }
 
         canvas.restore();
@@ -203,15 +172,37 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
 
     @Override
     public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-        if (mDivider == null) {
+        if (dividerSize == 0) {
             outRect.set(0, 0, 0, 0);
-            return;
+        } else if (mOrientation == DecorationStyle.VERTICAL) {
+            outRect.set(0, 0, 0, dividerSize);
+        } else {
+            outRect.set(0, 0, dividerSize, 0);
+        }
+    }
+
+    public static class Builder {
+        Integer color;
+        Integer size;
+        Integer orientation;
+
+        public Builder orientation(int orientation) {
+            this.orientation = orientation;
+            return this;
         }
 
-        if (mOrientation == VERTICAL) {
-            outRect.set(0, 0, 0, mDivider.getIntrinsicHeight());
-        } else {
-            outRect.set(0, 0, mDivider.getIntrinsicWidth(), 0);
+        public Builder color(int color) {
+            this.color = color;
+            return this;
+        }
+
+        public Builder size(int size) {
+            this.size = size;
+            return this;
+        }
+
+        public GridItemDecoration build() {
+            return new GridItemDecoration(this);
         }
     }
 }
