@@ -23,8 +23,17 @@ public class MainActivity extends AppCompatActivity {
         rv = findViewById(R.id.rv);
         rv.setLayoutManager(new GridLayoutManager(this, 3, RecyclerView.VERTICAL, false));
         rv.setAdapter(new Adapter(menu));
-        GridItemDecoration itemDec = new GridItemDecoration(this, GridItemDecoration.ROUNDALL, getColor(R.color.black));
+//        1.
+//        GridItemDecoration itemDec = new GridItemDecoration(GridItemDecoration.ROUNDALL);
 //        itemDec.setDividerColor(getColor(R.color.black));
+//        2.
+//        GridItemDecoration itemDec = new GridItemDecoration(GridItemDecoration.ROUNDALL, getColor(R.color.black));
+//        3.
+        GridItemDecoration itemDec = new GridItemDecoration.Builder()
+                .orientation(GridItemDecoration.ROUNDALL)
+                .color(getColor(R.color.black))
+                .size(5)
+                .build();
         rv.addItemDecoration(itemDec);
     }
 }
