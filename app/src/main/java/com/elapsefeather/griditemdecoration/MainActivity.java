@@ -17,14 +17,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        for (int i = 1; i < 21; i++) {
-            menu.add("star" + i);
+        for (int i = 0; i < 5; i++) {
+            menu.add("star" + (i + 1));
         }
         rv = findViewById(R.id.rv);
         rv.setLayoutManager(new GridLayoutManager(this, 3, RecyclerView.VERTICAL, false));
         rv.setAdapter(new Adapter(menu));
-        GridItemDecoration itemDec = new GridItemDecoration(this, GridItemDecoration.ROUNDALL);
-        itemDec.setDividerColor(getColor(R.color.black));
+        GridItemDecoration itemDec = new GridItemDecoration(this, GridItemDecoration.ROUNDALL, getColor(R.color.black));
+//        itemDec.setDividerColor(getColor(R.color.black));
         rv.addItemDecoration(itemDec);
     }
 }
