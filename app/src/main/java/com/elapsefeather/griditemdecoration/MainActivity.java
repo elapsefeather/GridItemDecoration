@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 //        GridItemDecoration itemDec = new GridItemDecoration(GridItemDecoration.ROUNDALL, getColor(R.color.black));
 //        3.
         GridItemDecoration itemDec = new GridItemDecoration.Builder()
-                .orientation(GridItemDecoration.ROUNDALL)
+                .orientation(GridItemDecoration.DecorationStyle.VERTICAL)
                 .color(getColor(R.color.black))
                 .size(5)
                 .build();

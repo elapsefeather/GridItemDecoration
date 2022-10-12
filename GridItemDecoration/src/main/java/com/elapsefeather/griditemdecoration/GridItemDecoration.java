@@ -13,10 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 public class GridItemDecoration extends RecyclerView.ItemDecoration {
     private static final String TAG = GridItemDecoration.class.getSimpleName();
 
-    public static final int HORIZONTAL = LinearLayout.HORIZONTAL;
-    public static final int VERTICAL = LinearLayout.VERTICAL;
-    public static final int INSIDEALL = 2;
-    public static final int ROUNDALL = 3;
+    public interface DecorationStyle {
+        int HORIZONTAL = LinearLayout.HORIZONTAL;
+        int VERTICAL = LinearLayout.VERTICAL;
+        int INSIDEALL = 2;
+        int ROUNDALL = 3;
+    }
 
     //    private mDivider;
     private int mOrientation = LinearLayout.VERTICAL;
@@ -66,7 +68,8 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
      * @param orientation [.HORIZONTAL] or [.VERTICAL] or [.INSIDEALL] or [.ROUNDALL]
      */
     public void setOrientation(int orientation) {
-        if (orientation != HORIZONTAL && orientation != VERTICAL && orientation != INSIDEALL && orientation != ROUNDALL) {
+        if (orientation != DecorationStyle.HORIZONTAL && orientation != DecorationStyle.VERTICAL
+                && orientation != DecorationStyle.INSIDEALL && orientation != DecorationStyle.ROUNDALL) {
             throw new IllegalArgumentException("Invalid orientation. It should be either HORIZONTAL or VERTICAL");
         }
         mOrientation = orientation;
@@ -83,14 +86,15 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
         if (parent.getLayoutManager() == null) return;
 
         switch (mOrientation) {
-            case ROUNDALL:
-            case INSIDEALL:
+            case DecorationStyle.ROUNDALL:
+            case DecorationStyle.INSIDEALL:
                 drawVertical(c, parent);
                 drawHorizontal(c, parent);
                 break;
-            case VERTICAL:
+            case DecorationStyle.VERTICAL:
                 drawVertical(c, parent);
                 break;
+            case DecorationStyle.HORIZONTAL:
             default:
                 drawHorizontal(c, parent);
                 break;
@@ -122,7 +126,7 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
             childCount -= leftItems;
         }
 
-        if (mOrientation == ROUNDALL) {
+        if (mOrientation == DecorationStyle.ROUNDALL) {
             //最上面那條
             View child = parent.getChildAt(0);
             if (child == null) return;
@@ -168,7 +172,7 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
             childCount = ((GridLayoutManager) parent.getLayoutManager()).getSpanCount();
         }
 
-        if (mOrientation == ROUNDALL) {
+        if (mOrientation == DecorationStyle.ROUNDALL) {
             //最左邊那條
             View child = parent.getChildAt(0);
             if (child == null) return;
@@ -197,7 +201,7 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
     public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         if (dividerSize == 0) {
             outRect.set(0, 0, 0, 0);
-        } else if (mOrientation == VERTICAL) {
+        } else if (mOrientation == DecorationStyle.VERTICAL) {
             outRect.set(0, 0, 0, dividerSize);
         } else {
             outRect.set(0, 0, dividerSize, 0);
