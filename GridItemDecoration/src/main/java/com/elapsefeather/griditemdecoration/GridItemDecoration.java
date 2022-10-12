@@ -1,7 +1,5 @@
 package com.elapsefeather.griditemdecoration;
 
-import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -21,33 +19,38 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
     public static final int ROUNDALL = 3;
 
     //    private mDivider;
-    private int mOrientation = 0;
-    private Rect mBounds;
-    private int dividerColor = 0xff000000;
-    private int dividerSize = 5;
+    private int mOrientation = LinearLayout.VERTICAL;
+    private Rect mBounds = new Rect();
+    private int dividerColor;
+    private int dividerSize;
     private Paint mPaint;
+    private Builder mBuilder;
 
     /**
      * Creates a divider [RecyclerView.ItemDecoration] that can be used with a
      * [LinearLayoutManager].
      *
-     * @param context     Current context, it will be used to access resources.
-     * @param orientation Divider orientation. Should be [.HORIZONTAL] or [.VERTICAL].
+     * @param orientation Divider orientation. Should be [.HORIZONTAL] or [.VERTICAL] or [.INSIDEALL] or [.ROUNDALL]
      */
-    public GridItemDecoration(Context context, int orientation) {
-        mBounds = new Rect();
-        TypedArray a = context.obtainStyledAttributes(new int[]{android.R.attr.listDivider});
-        a.recycle();
+    public GridItemDecoration(int orientation) {
         setOrientation(orientation);
         initPaint();
     }
 
-    public GridItemDecoration(Context context, int orientation, int color) {
-        mBounds = new Rect();
+    public GridItemDecoration(int orientation, int color) {
         this.dividerColor = color;
-        TypedArray a = context.obtainStyledAttributes(new int[]{android.R.attr.listDivider});
-        a.recycle();
         setOrientation(orientation);
+        initPaint();
+    }
+
+    public GridItemDecoration(Builder builder) {
+        if (builder != null) {
+            this.mBuilder = builder;
+
+            if (builder.orientation != null) setOrientation(builder.orientation);
+            if (builder.color != null) dividerColor = builder.color;
+            if (builder.size != null) dividerSize = builder.size;
+        }
         initPaint();
     }
 
@@ -198,6 +201,31 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
             outRect.set(0, 0, 0, dividerSize);
         } else {
             outRect.set(0, 0, dividerSize, 0);
+        }
+    }
+
+    public static class Builder {
+        Integer color;
+        Integer size;
+        Integer orientation;
+
+        public Builder orientation(int orientation) {
+            this.orientation = orientation;
+            return this;
+        }
+
+        public Builder color(int color) {
+            this.color = color;
+            return this;
+        }
+
+        public Builder size(int size) {
+            this.size = size;
+            return this;
+        }
+
+        public GridItemDecoration build() {
+            return new GridItemDecoration(this);
         }
     }
 }
