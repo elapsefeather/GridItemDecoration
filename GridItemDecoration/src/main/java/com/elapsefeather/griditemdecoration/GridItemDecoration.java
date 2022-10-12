@@ -104,39 +104,10 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
     private void drawVertical(Canvas canvas, RecyclerView parent) {
         canvas.save();
 
-        int left;
-        int right;
-
-        if (parent.getClipToPadding()) {
-            left = parent.getPaddingLeft();
-            right = parent.getWidth() - parent.getPaddingRight();
-            canvas.clipRect(left, parent.getPaddingTop(), right, parent.getHeight() - parent.getPaddingBottom());
-        } else {
-            left = 0;
-            right = parent.getWidth();
-        }
-
         int childCount = parent.getChildCount();
-
+        int spanCount = -1;
         if (parent.getLayoutManager() instanceof GridLayoutManager) {
-            int leftItems = childCount % ((GridLayoutManager) parent.getLayoutManager()).getSpanCount();
-            if (leftItems == 0) {
-                leftItems = ((GridLayoutManager) parent.getLayoutManager()).getSpanCount();
-            }
-            childCount -= leftItems;
-        }
-
-        if (mOrientation == DecorationStyle.ROUNDALL) {
-            //最上面那條
-            View child = parent.getChildAt(0);
-            if (child == null) return;
-
-            parent.getDecoratedBoundsWithMargins(child, mBounds);
-            int bottom = dividerSize;
-            int top = 0;
-            canvas.drawRect(left, top, right, bottom, mPaint);
-        } else {
-            childCount -= 1;
+            spanCount = ((GridLayoutManager) parent.getLayoutManager()).getSpanCount();
         }
 
         for (int i = 0; i <= childCount; i++) {
@@ -144,9 +115,22 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
             if (child == null) return;
 
             parent.getDecoratedBoundsWithMargins(child, mBounds);
-            int bottom = mBounds.bottom + Math.round(child.getTranslationY());
-            int top = bottom - dividerSize;
-            canvas.drawRect(left, top, right, bottom, mPaint);
+            int left = mBounds.left;
+            int right = mBounds.right;
+
+//                最上面那條
+            if (mOrientation == DecorationStyle.ROUNDALL && spanCount != -1 && i < childCount - childCount % spanCount) {
+                int bottom = dividerSize;
+                int top = 0;
+                canvas.drawRect(left, top, right, bottom, mPaint);
+            }
+//            最下面的，除非是 ROUNDALL 不然不畫
+            if (mOrientation == DecorationStyle.ROUNDALL ||
+                    (mOrientation != DecorationStyle.ROUNDALL && spanCount != -1 && i < childCount - childCount % spanCount)) {
+                int bottom = mBounds.bottom + Math.round(child.getTranslationY());
+                int top = bottom - dividerSize;
+                canvas.drawRect(left, top, right, bottom, mPaint);
+            }
         }
 
         canvas.restore();
@@ -155,43 +139,32 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
     private void drawHorizontal(Canvas canvas, RecyclerView parent) {
         canvas.save();
 
-        int top;
-        int bottom;
-
-        if (parent.getClipToPadding()) {
-            top = parent.getPaddingTop();
-            bottom = parent.getHeight() - parent.getPaddingBottom();
-            canvas.clipRect(parent.getPaddingLeft(), top, parent.getWidth() - parent.getPaddingRight(), bottom);
-        } else {
-            top = 0;
-            bottom = parent.getHeight();
-        }
-
         int childCount = parent.getChildCount();
+        int spanCount = -1;
         if (parent.getLayoutManager() instanceof GridLayoutManager) {
-            childCount = ((GridLayoutManager) parent.getLayoutManager()).getSpanCount();
-        }
-
-        if (mOrientation == DecorationStyle.ROUNDALL) {
-            //最左邊那條
-            View child = parent.getChildAt(0);
-            if (child == null) return;
-
-            parent.getLayoutManager().getDecoratedBoundsWithMargins(child, mBounds);
-            int right = dividerSize;
-            int left = 0;
-            canvas.drawRect(left, top, right, bottom, mPaint);
-        } else {
-            childCount -= 1;
+            spanCount = ((GridLayoutManager) parent.getLayoutManager()).getSpanCount();
         }
 
         for (int i = 0; i <= childCount - 1; i++) {
             View child = parent.getChildAt(i);
             if (child == null) return;
             parent.getLayoutManager().getDecoratedBoundsWithMargins(child, mBounds);
-            int right = mBounds.right + Math.round(child.getTranslationX());
-            int left = right - dividerSize;
-            canvas.drawRect(left, top, right, bottom, mPaint);
+            int top = mBounds.top;
+            int bottom = mBounds.bottom;
+
+//                最左邊那條
+            if (mOrientation == DecorationStyle.ROUNDALL && spanCount != -1 && i % spanCount == 0) {
+                int right = dividerSize;
+                int left = 0;
+                canvas.drawRect(left, top, right, bottom, mPaint);
+            }
+//            最右邊的，除非是 ROUNDALL 不然不畫
+            if (mOrientation == DecorationStyle.ROUNDALL ||
+                    (mOrientation != DecorationStyle.ROUNDALL && spanCount != -1 && i % spanCount != 2)) {
+                int right = mBounds.right + Math.round(child.getTranslationX());
+                int left = right - dividerSize;
+                canvas.drawRect(left, top, right, bottom, mPaint);
+            }
         }
 
         canvas.restore();
