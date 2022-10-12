@@ -3,11 +3,8 @@ package com.elapsefeather.griditemdecoration;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
+import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -23,9 +20,12 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
     public static final int INSIDEALL = 2;
     public static final int ROUNDALL = 3;
 
-    private Drawable mDivider;
-    private int mOrientation;
+    //    private mDivider;
+    private int mOrientation = 0;
     private Rect mBounds;
+    private int dividerColor = 0xff000000;
+    private int dividerSize = 5;
+    private Paint mPaint;
 
     /**
      * Creates a divider [RecyclerView.ItemDecoration] that can be used with a
@@ -35,33 +35,32 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
      * @param orientation Divider orientation. Should be [.HORIZONTAL] or [.VERTICAL].
      */
     public GridItemDecoration(Context context, int orientation) {
-        mDivider = null;
-        /**
-         * Current orientation. Either [.HORIZONTAL] or [.VERTICAL].
-         */
-        mOrientation = 0;
         mBounds = new Rect();
-
         TypedArray a = context.obtainStyledAttributes(new int[]{android.R.attr.listDivider});
-        mDivider = context.getDrawable(R.drawable.divider);
-        if (mDivider == null) {
-            Log.w(TAG, "@android:attr/listDivider was not set in the theme used for this " + "DividerItemDecoration. Please set that attribute all call setDrawable()");
-        }
         a.recycle();
         setOrientation(orientation);
+        initPaint();
+    }
 
+    public GridItemDecoration(Context context, int orientation, int color) {
+        mBounds = new Rect();
+        this.dividerColor = color;
+        TypedArray a = context.obtainStyledAttributes(new int[]{android.R.attr.listDivider});
+        a.recycle();
+        setOrientation(orientation);
+        initPaint();
     }
 
     public void setDividerColor(int color) {
-        if (mDivider != null)
-            mDivider.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP));
+        this.dividerColor = color;
+        initPaint();
     }
 
     /**
      * Sets the orientation for this divider. This should be called if
      * [RecyclerView.LayoutManager] changes orientation.
      *
-     * @param orientation [.HORIZONTAL] or [.VERTICAL]
+     * @param orientation [.HORIZONTAL] or [.VERTICAL] or [.INSIDEALL] or [.ROUNDALL]
      */
     public void setOrientation(int orientation) {
         if (orientation != HORIZONTAL && orientation != VERTICAL && orientation != INSIDEALL && orientation != ROUNDALL) {
@@ -70,21 +69,15 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
         mOrientation = orientation;
     }
 
-    /**
-     * Sets the [Drawable] for this divider.
-     *
-     * @param drawable Drawable that should be used as a divider.
-     */
-    public void setDrawable(Drawable drawable) {
-        if (drawable == null) {
-            throw new IllegalArgumentException("Drawable cannot be null.");
-        }
-        mDivider = drawable;
+    private void initPaint() {
+        mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPaint.setStyle(Paint.Style.FILL);
+        mPaint.setColor(dividerColor);
     }
 
     @Override
     public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-        if (parent.getLayoutManager() == null || mDivider == null) return;
+        if (parent.getLayoutManager() == null) return;
 
         switch (mOrientation) {
             case ROUNDALL:
@@ -132,10 +125,9 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
             if (child == null) return;
 
             parent.getDecoratedBoundsWithMargins(child, mBounds);
-            int bottom = mDivider.getIntrinsicHeight();
+            int bottom = dividerSize;
             int top = 0;
-            mDivider.setBounds(left, top, right, bottom);
-            mDivider.draw(canvas);
+            canvas.drawRect(left, top, right, bottom, mPaint);
         } else {
             childCount -= 1;
         }
@@ -146,9 +138,8 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
 
             parent.getDecoratedBoundsWithMargins(child, mBounds);
             int bottom = mBounds.bottom + Math.round(child.getTranslationY());
-            int top = bottom - mDivider.getIntrinsicHeight();
-            mDivider.setBounds(left, top, right, bottom);
-            mDivider.draw(canvas);
+            int top = bottom - dividerSize;
+            canvas.drawRect(left, top, right, bottom, mPaint);
         }
 
         canvas.restore();
@@ -180,10 +171,9 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
             if (child == null) return;
 
             parent.getLayoutManager().getDecoratedBoundsWithMargins(child, mBounds);
-            int right = mDivider.getIntrinsicWidth();
+            int right = dividerSize;
             int left = 0;
-            mDivider.setBounds(left, top, right, bottom);
-            mDivider.draw(canvas);
+            canvas.drawRect(left, top, right, bottom, mPaint);
         } else {
             childCount -= 1;
         }
@@ -193,9 +183,8 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
             if (child == null) return;
             parent.getLayoutManager().getDecoratedBoundsWithMargins(child, mBounds);
             int right = mBounds.right + Math.round(child.getTranslationX());
-            int left = right - mDivider.getIntrinsicWidth();
-            mDivider.setBounds(left, top, right, bottom);
-            mDivider.draw(canvas);
+            int left = right - dividerSize;
+            canvas.drawRect(left, top, right, bottom, mPaint);
         }
 
         canvas.restore();
@@ -203,15 +192,12 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
 
     @Override
     public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-        if (mDivider == null) {
+        if (dividerSize == 0) {
             outRect.set(0, 0, 0, 0);
-            return;
-        }
-
-        if (mOrientation == VERTICAL) {
-            outRect.set(0, 0, 0, mDivider.getIntrinsicHeight());
+        } else if (mOrientation == VERTICAL) {
+            outRect.set(0, 0, 0, dividerSize);
         } else {
-            outRect.set(0, 0, mDivider.getIntrinsicWidth(), 0);
+            outRect.set(0, 0, dividerSize, 0);
         }
     }
 }
