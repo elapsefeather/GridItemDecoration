@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class GridItemDecoration extends RecyclerView.ItemDecoration {
@@ -108,6 +109,10 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
         int spanCount = -1;
         if (parent.getLayoutManager() instanceof GridLayoutManager) {
             spanCount = ((GridLayoutManager) parent.getLayoutManager()).getSpanCount();
+        } else if (mOrientation != DecorationStyle.ROUNDALL
+                && parent.getLayoutManager() instanceof LinearLayoutManager
+                && ((LinearLayoutManager) parent.getLayoutManager()).getOrientation() == RecyclerView.HORIZONTAL) {
+            return;
         }
 
         for (int i = 0; i <= childCount; i++) {
@@ -119,14 +124,17 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
             int right = mBounds.right;
 
 //                最上面那條
-            if (mOrientation == DecorationStyle.ROUNDALL && spanCount != -1 && i < childCount - childCount % spanCount) {
+            if (mOrientation == DecorationStyle.ROUNDALL
+                    && (spanCount == -1 || spanCount != -1 && i < childCount - childCount % spanCount)) {
                 int bottom = dividerSize;
                 int top = 0;
                 canvas.drawRect(left, top, right, bottom, mPaint);
             }
 //            最下面的，除非是 ROUNDALL 不然不畫
-            if (mOrientation == DecorationStyle.ROUNDALL ||
-                    (mOrientation != DecorationStyle.ROUNDALL && spanCount != -1 && i < childCount - childCount % spanCount)) {
+            if (mOrientation == DecorationStyle.ROUNDALL
+                    || (mOrientation != DecorationStyle.ROUNDALL
+                    && ((spanCount == -1 && i != childCount - 1)
+                    || (spanCount != -1 && childCount > spanCount && i < childCount - childCount % spanCount)))) {
                 int bottom = mBounds.bottom + Math.round(child.getTranslationY());
                 int top = bottom - dividerSize;
                 canvas.drawRect(left, top, right, bottom, mPaint);
@@ -143,6 +151,10 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
         int spanCount = -1;
         if (parent.getLayoutManager() instanceof GridLayoutManager) {
             spanCount = ((GridLayoutManager) parent.getLayoutManager()).getSpanCount();
+        } else if (mOrientation != DecorationStyle.ROUNDALL
+                && parent.getLayoutManager() instanceof LinearLayoutManager
+                && ((LinearLayoutManager) parent.getLayoutManager()).getOrientation() == RecyclerView.VERTICAL) {
+            return;
         }
 
         for (int i = 0; i <= childCount - 1; i++) {
@@ -153,14 +165,17 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
             int bottom = mBounds.bottom;
 
 //                最左邊那條
-            if (mOrientation == DecorationStyle.ROUNDALL && spanCount != -1 && i % spanCount == 0) {
+            if (mOrientation == DecorationStyle.ROUNDALL
+                    && (spanCount == -1 || spanCount != -1 && i % spanCount == 0)) {
                 int right = dividerSize;
                 int left = 0;
                 canvas.drawRect(left, top, right, bottom, mPaint);
             }
 //            最右邊的，除非是 ROUNDALL 不然不畫
-            if (mOrientation == DecorationStyle.ROUNDALL ||
-                    (mOrientation != DecorationStyle.ROUNDALL && spanCount != -1 && i % spanCount != 2)) {
+            if (mOrientation == DecorationStyle.ROUNDALL
+                    || (mOrientation != DecorationStyle.ROUNDALL
+                    && ((spanCount == -1 && i != childCount - 1)
+                    || spanCount != -1 && i % spanCount != 2))) {
                 int right = mBounds.right + Math.round(child.getTranslationX());
                 int left = right - dividerSize;
                 canvas.drawRect(left, top, right, bottom, mPaint);
