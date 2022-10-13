@@ -134,7 +134,7 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
             if (mOrientation == DecorationStyle.ROUNDALL
                     || (mOrientation != DecorationStyle.ROUNDALL
                     && ((spanCount == -1 && i != childCount - 1)
-                    || (spanCount != -1 && i < childCount - childCount % spanCount)))) {
+                    || (spanCount != -1 && childCount > spanCount && i < childCount - childCount % spanCount)))) {
                 int bottom = mBounds.bottom + Math.round(child.getTranslationY());
                 int top = bottom - dividerSize;
                 canvas.drawRect(left, top, right, bottom, mPaint);
