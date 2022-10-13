@@ -16,7 +16,8 @@
 | <img src="https://github.com/elapsefeather/GridItemDecoration/blob/925babd1501a3593b28831d9074728dc11fb81c1/screenshots/531.jpg" height="500"> & <img src="https://github.com/elapsefeather/GridItemDecoration/blob/3270cd0bfc779de158068dcc2bdcd9e4bbfee31a/screenshots/554.jpg" height="500">|
 | setDividerColor(Color)       |
 | <img src="https://github.com/elapsefeather/GridItemDecoration/blob/925babd1501a3593b28831d9074728dc11fb81c1/screenshots/529.jpg" height="500">|
-
+| Use LinearLayoutManager       |
+|<img src="https://github.com/elapsefeather/GridItemDecoration/blob/fa47564add19010b584d00d99bde95f3e83849ea/screenshots/555.jpg" height="500"> & <img src="https://github.com/elapsefeather/GridItemDecoration/blob/fa47564add19010b584d00d99bde95f3e83849ea/screenshots/556.jpg" height="500"> & <img src="https://github.com/elapsefeather/GridItemDecoration/blob/fa47564add19010b584d00d99bde95f3e83849ea/screenshots/557.jpg" height="500"> & <img src="https://github.com/elapsefeather/GridItemDecoration/blob/fa47564add19010b584d00d99bde95f3e83849ea/screenshots/558.jpg" height="500">|
 ## Setup
 
 The easiest way to add the **GridItemDecoration** library to your project is by adding it as a
@@ -36,7 +37,7 @@ allprojects {
 
 ```gradle
 dependencies {
-     implementation 'com.github.elapsefeather:GridItemDecoration:1.1.0'
+     implementation 'com.github.elapsefeather:GridItemDecoration:1.1.1'
 }
 ```
 
@@ -66,8 +67,10 @@ or
 
 ## Version History
 
-> ### v1.0.0
-> - new project.
+> ### v1.1.0 (2022/10/13)
+> #### Bug Fixes:
+> - 修正 LinearLayoutManager 使用上的繪製錯誤
+> - 修正 GridLayoutManager 使用上數量不足的繪製錯誤
 
 > ### v1.1.0 (2022/10/12)
 > #### Framework Enhancements:
@@ -78,5 +81,8 @@ or
 >
 > #### Bug Fixes:
 > - 修正項目不足仍會繪製分隔線問題
+
+> ### v1.0.0(2022/10/01)
+> - new project.
 
 
