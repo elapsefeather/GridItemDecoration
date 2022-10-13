@@ -19,6 +19,8 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
         int VERTICAL = LinearLayout.VERTICAL;
         int INSIDEALL = 2;
         int ROUNDALL = 3;
+        int OVERHORIZONTAL = 4;
+        int OVERVERTICAL = 5;
     }
 
     //    private mDivider;
@@ -66,11 +68,12 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
      * Sets the orientation for this divider. This should be called if
      * [RecyclerView.LayoutManager] changes orientation.
      *
-     * @param orientation [.HORIZONTAL] or [.VERTICAL] or [.INSIDEALL] or [.ROUNDALL]
+     * @param orientation [.HORIZONTAL] or [.VERTICAL] or [.INSIDEALL] or [.ROUNDALL] or [.OVERHORIZONTAL] or [.OVERVERTICAL]
      */
     public void setOrientation(int orientation) {
         if (orientation != DecorationStyle.HORIZONTAL && orientation != DecorationStyle.VERTICAL
-                && orientation != DecorationStyle.INSIDEALL && orientation != DecorationStyle.ROUNDALL) {
+                && orientation != DecorationStyle.INSIDEALL && orientation != DecorationStyle.ROUNDALL
+                && orientation != DecorationStyle.OVERHORIZONTAL && orientation != DecorationStyle.OVERVERTICAL) {
             throw new IllegalArgumentException("Invalid orientation. It should be either HORIZONTAL or VERTICAL");
         }
         mOrientation = orientation;
@@ -93,9 +96,11 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
                 drawHorizontal(c, parent);
                 break;
             case DecorationStyle.VERTICAL:
+            case DecorationStyle.OVERVERTICAL:
                 drawVertical(c, parent);
                 break;
             case DecorationStyle.HORIZONTAL:
+            case DecorationStyle.OVERHORIZONTAL:
             default:
                 drawHorizontal(c, parent);
                 break;
@@ -131,7 +136,7 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
                 canvas.drawRect(left, top, right, bottom, mPaint);
             }
 //            最下面的，除非是 ROUNDALL 不然不畫
-            if (mOrientation == DecorationStyle.ROUNDALL
+            if (mOrientation == DecorationStyle.ROUNDALL || mOrientation == DecorationStyle.OVERVERTICAL
                     || (mOrientation != DecorationStyle.ROUNDALL
                     && ((spanCount == -1 && i != childCount - 1)
                     || (spanCount != -1 && childCount > spanCount && i < childCount - childCount % spanCount)))) {
@@ -172,7 +177,7 @@ public class GridItemDecoration extends RecyclerView.ItemDecoration {
                 canvas.drawRect(left, top, right, bottom, mPaint);
             }
 //            最右邊的，除非是 ROUNDALL 不然不畫
-            if (mOrientation == DecorationStyle.ROUNDALL
+            if (mOrientation == DecorationStyle.ROUNDALL || mOrientation == DecorationStyle.OVERHORIZONTAL
                     || (mOrientation != DecorationStyle.ROUNDALL
                     && ((spanCount == -1 && i != childCount - 1)
                     || spanCount != -1 && i % spanCount != 2))) {
