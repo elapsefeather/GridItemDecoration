@@ -1,6 +1,7 @@
 # GridItemDecoration
 
 [![](https://jitpack.io/v/elapsefeather/GridItemDecoration.svg)](https://jitpack.io/#elapsefeather/GridItemDecoration)
+適配 GridLayout、LearnerLayout 項目分割線 ItemDecoration，可選多種樣式
 
 ## sample
 
@@ -18,6 +19,7 @@
 | <img src="https://github.com/elapsefeather/GridItemDecoration/blob/925babd1501a3593b28831d9074728dc11fb81c1/screenshots/529.jpg" height="500">|
 | Use LinearLayoutManager       |
 |<img src="https://github.com/elapsefeather/GridItemDecoration/blob/fa47564add19010b584d00d99bde95f3e83849ea/screenshots/555.jpg" height="500"> & <img src="https://github.com/elapsefeather/GridItemDecoration/blob/fa47564add19010b584d00d99bde95f3e83849ea/screenshots/556.jpg" height="500"> & <img src="https://github.com/elapsefeather/GridItemDecoration/blob/fa47564add19010b584d00d99bde95f3e83849ea/screenshots/557.jpg" height="500"> & <img src="https://github.com/elapsefeather/GridItemDecoration/blob/fa47564add19010b584d00d99bde95f3e83849ea/screenshots/558.jpg" height="500">|
+
 ## Setup
 
 The easiest way to add the **GridItemDecoration** library to your project is by adding it as a
