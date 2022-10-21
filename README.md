@@ -1,7 +1,7 @@
 # GridItemDecoration
 
-[![](https://jitpack.io/v/elapsefeather/GridItemDecoration.svg)](https://jitpack.io/#elapsefeather/GridItemDecoration)
-適配 GridLayout、LearnerLayout 項目分割線 ItemDecoration，可選多種樣式
+[![](https://jitpack.io/v/elapsefeather/GridItemDecoration.svg)](https://jitpack.io/#elapsefeather/GridItemDecoration)    
+適配 GridLayout、LearnerLayout 項目分割線 ItemDecoration，可選多種樣式，不需設置 line Drawable 
 
 ## sample
 
@@ -15,6 +15,8 @@
 | <img src="https://github.com/elapsefeather/GridItemDecoration/blob/925babd1501a3593b28831d9074728dc11fb81c1/screenshots/530.jpg" height="500"> & <img src="https://github.com/elapsefeather/GridItemDecoration/blob/3270cd0bfc779de158068dcc2bdcd9e4bbfee31a/screenshots/553.jpg" height="500">|
 | DecorationStyle.INSIDEALL    |
 | <img src="https://github.com/elapsefeather/GridItemDecoration/blob/925babd1501a3593b28831d9074728dc11fb81c1/screenshots/531.jpg" height="500"> & <img src="https://github.com/elapsefeather/GridItemDecoration/blob/3270cd0bfc779de158068dcc2bdcd9e4bbfee31a/screenshots/554.jpg" height="500">|
+| DecorationStyle.OVERVERTICAL & DecorationStyle.OVERHORIZONTAL <br> 與原生 ItemDecoration 同樣擁有最後一項分隔線 |
+| <img src="https://github.com/elapsefeather/GridItemDecoration/blob/6ac67e32d827512cac650e3f04d797010e3a571e/screenshots/567.jpg" height="500"> & <img src="https://github.com/elapsefeather/GridItemDecoration/blob/6ac67e32d827512cac650e3f04d797010e3a571e/screenshots/568.jpg" height="500">|
 | setDividerColor(Color)       |
 | <img src="https://github.com/elapsefeather/GridItemDecoration/blob/925babd1501a3593b28831d9074728dc11fb81c1/screenshots/529.jpg" height="500">|
 | Use LinearLayoutManager       |
@@ -39,7 +41,7 @@ allprojects {
 
 ```gradle
 dependencies {
-     implementation 'com.github.elapsefeather:GridItemDecoration:1.1.1'
+     implementation 'com.github.elapsefeather:GridItemDecoration:1.1.2'
 }
 ```
 
@@ -69,7 +71,11 @@ or
 
 ## Version History
 
-> ### v1.1.0 (2022/10/13)
+> ### v1.1.2 (2022/10/21)
+> #### Framework Enhancements:
+> - 增設 DecorationStyle.OVERVERTICAL & DecorationStyle.OVERHORIZONTAL 樣式
+
+> ### v1.1.1 (2022/10/13)
 > #### Bug Fixes:
 > - 修正 LinearLayoutManager 使用上的繪製錯誤
 > - 修正 GridLayoutManager 使用上數量不足的繪製錯誤
