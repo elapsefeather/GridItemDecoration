@@ -13,8 +13,9 @@ import java.util.List;
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     List<String> list;
 
-    public Adapter(List<String> list) {
+    public void setList(List<String> list) {
         this.list = list;
+        notifyDataSetChanged();
     }
 
     @NonNull

@@ -4,6 +4,7 @@
 適配 GridLayout、LearnerLayout 項目分割線 ItemDecoration，可選多種樣式，不需設置 line Drawable 
 
 ## sample
+<img src="./screenshots/GridItemDecoration.gif" height="500">
 
 | 樣式範例                       | 
 | -------------                 |
